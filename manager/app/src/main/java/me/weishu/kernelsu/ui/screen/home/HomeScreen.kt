@@ -44,8 +44,8 @@ fun HomePager(
     val scope = rememberCoroutineScope()
     val latestIsCurrentPage by rememberUpdatedState(isCurrentPage)
     val initialResumeHandled = rememberSaveable { mutableStateOf(false) }
-
     var hasActivated by rememberSaveable { mutableStateOf(false) }
+
     LaunchedEffect(isCurrentPage) {
         if (isCurrentPage && !hasActivated) {
             hasActivated = true
@@ -67,8 +67,6 @@ fun HomePager(
         onJailbreakClick = {
             loadingDialog.showLoading()
             context.startService(Intent(context, MagicaService::class.java))
-            // Manager will be force-stopped and restarted by late-load on success.
-            // If that doesn't happen within timeout, jailbreak likely failed.
             scope.launch(Dispatchers.IO) {
                 delay(30_000.milliseconds)
                 withContext(Dispatchers.Main) {
@@ -85,8 +83,7 @@ fun HomePager(
             actions = actions,
             bottomInnerPadding = bottomInnerPadding,
         )
-
-        UiMode.Material -> HomePagerMaterial(
+        UiMode.Material -> HomePagerRune(
             state = uiState,
             actions = actions,
             bottomInnerPadding = bottomInnerPadding,
