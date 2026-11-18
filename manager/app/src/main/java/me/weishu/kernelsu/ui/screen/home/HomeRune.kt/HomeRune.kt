@@ -31,15 +31,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.weishu.kernelsu.ui.component.whale.WhalePet
-import me.weishu.kernelsu.ui.component.whale.WhaleState
 
 private val Bg = Color(0xFFF4F5F7)
 private val Panel = Color(0xFFFFFFFF)
-private val Panel2 = Color(0xFFEDEFF2)
 private val Border = Color(0xFFE3E6EA)
 private val TextColor = Color(0xFF1A1C1E)
 private val Muted = Color(0xFF6B7280)
-private val Accent = Color(0xFF1F2937)
 private val WarnColor = Color(0xFFD97706)
 private val OkColor = Color(0xFF16A34A)
 private val BadColor = Color(0xFFDC2626)
@@ -54,49 +51,66 @@ fun HomePagerRune(
     val installed = state.ksuVersion != null
     val rootOk = state.isRootAvailable
 
-    Column(
+    Box(
         Modifier
             .fillMaxSize()
             .background(Bg)
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 16.dp)
-            .padding(bottom = bottomInnerPadding + 24.dp)
     ) {
-        Spacer(Modifier.height(18.dp))
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f)) {
-                Text("RuneSU", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = TextColor)
-                Spacer(Modifier.height(2.dp))
-                Text(
-                    "${sys.deviceModel} · ${sys.managerVersion}",
-                    fontSize = 11.sp, color = Muted, maxLines = 1, overflow = TextOverflow.Ellipsis
-                )
-            }
-            WhalePet(
-                modifier = Modifier.size(104.dp),
-                state = if (installed) WhaleState.Idle else WhaleState.Weak,
-                onTap = { actions.onInstallClick() },
+        Column(
+            Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp)
+                .padding(bottom = bottomInnerPadding + 170.dp)
+        ) {
+            Spacer(Modifier.height(14.dp))
+            Text("RuneSU", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = TextColor)
+            Spacer(Modifier.height(2.dp))
+            Text(
+                "${sys.deviceModel} · ${sys.managerVersion}",
+                fontSize = 11.sp, color = Muted, maxLines = 1, overflow = TextOverflow.Ellipsis
             )
+
+            Spacer(Modifier.height(14.dp))
+            StatusCard(installed, rootOk, state, actions)
+
+            Spacer(Modifier.height(8.dp))
+            PerfCard(state)
+
+            Spacer(Modifier.height(16.dp))
+            Text("设备", fontSize = 11.sp, color = Muted,
+                modifier = Modifier.padding(start = 2.dp, bottom = 6.dp))
+            DeviceCard(sys)
+
+            Spacer(Modifier.height(16.dp))
+            Text("安全", fontSize = 11.sp, color = Muted,
+                modifier = Modifier.padding(start = 2.dp, bottom = 6.dp))
+            PlainCard {
+                InfoRow(Icons.Outlined.Security, "SELinux", sys.selinuxStatus.ifBlank { "未知" })
+                HorizontalDivider(thickness = 0.7.dp, color = Border)
+                InfoRow(Icons.Outlined.Tune, "Seccomp", seccompText(sys.seccompStatus))
+            }
         }
 
-        Spacer(Modifier.height(6.dp))
-        StatusCard(installed, rootOk, state, actions)
-
-        Spacer(Modifier.height(8.dp))
-        PerfCard(state)
-
-        Spacer(Modifier.height(16.dp))
-        Text("设备", fontSize = 11.sp, color = Muted,
-            modifier = Modifier.padding(start = 2.dp, bottom = 6.dp))
-        DeviceCard(sys)
-
-        Spacer(Modifier.height(16.dp))
-        Text("安全", fontSize = 11.sp, color = Muted,
-            modifier = Modifier.padding(start = 2.dp, bottom = 6.dp))
-        PlainCard {
-            InfoRow(Icons.Outlined.Security, "SELinux", sys.selinuxStatus.ifBlank { "未知" })
-            HorizontalDivider(thickness = 0.7.dp, color = Border)
-            InfoRow(Icons.Outlined.Tune, "Seccomp", seccompText(sys.seccompStatus))
+        // 右下角的小鲸鱼：不随内容滚动
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(end = 4.dp, bottom = bottomInnerPadding)
+        ) {
+            WhalePet(
+                modifier = Modifier.size(168.dp),
+                onTap = { actions.onInstallClick() },
+            )
+            if (!installed) {
+                Box(
+                    Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(top = 26.dp, end = 22.dp)
+                        .size(9.dp)
+                        .background(WarnColor, CircleShape)
+                )
+            }
         }
     }
 }
