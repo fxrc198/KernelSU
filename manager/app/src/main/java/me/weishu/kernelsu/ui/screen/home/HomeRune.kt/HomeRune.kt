@@ -30,6 +30,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import me.weishu.kernelsu.ui.component.whale.WhalePet
+import me.weishu.kernelsu.ui.component.whale.WhaleState
 
 private val Bg = Color(0xFFF4F5F7)
 private val Panel = Color(0xFFFFFFFF)
@@ -60,15 +62,24 @@ fun HomePagerRune(
             .padding(horizontal = 16.dp)
             .padding(bottom = bottomInnerPadding + 24.dp)
     ) {
-        Spacer(Modifier.height(22.dp))
-        Text("RuneSU", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = TextColor)
-        Spacer(Modifier.height(2.dp))
-        Text(
-            "${sys.deviceModel} · ${sys.managerVersion}",
-            fontSize = 11.sp, color = Muted, maxLines = 1, overflow = TextOverflow.Ellipsis
-        )
+        Spacer(Modifier.height(18.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Text("RuneSU", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = TextColor)
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    "${sys.deviceModel} · ${sys.managerVersion}",
+                    fontSize = 11.sp, color = Muted, maxLines = 1, overflow = TextOverflow.Ellipsis
+                )
+            }
+            WhalePet(
+                modifier = Modifier.size(104.dp),
+                state = if (installed) WhaleState.Idle else WhaleState.Weak,
+                onTap = { actions.onInstallClick() },
+            )
+        }
 
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(6.dp))
         StatusCard(installed, rootOk, state, actions)
 
         Spacer(Modifier.height(8.dp))
